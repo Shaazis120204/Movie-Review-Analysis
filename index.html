@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinemaSense AI | Advanced Movie Emotion Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #8B5CF6, #EC4899);
+            --secondary-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background: var(--secondary-gradient);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: var(--primary-gradient);
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tabs-container {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            background: rgba(35, 33, 49, 0.6);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+            border: 1px solid var(--glass-border);
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .tab.active {
+            background: rgba(167, 139, 250, 0.3);
+        }
+
+        .tab.active::before {
+            opacity: 0.3;
+        }
+
+        .tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-section, .output-section {
+            flex: 1;
+            min-width: 300px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            animation: slideIn 0.8s ease-out;
+            transition: transform 0.3s ease;
+        }
+
+        .input-section:hover, .output-section:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #a78bfa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .movie-name-input {
+            width: 100%;
+            background: rgba(35, 33, 49, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: #e6e6e6;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .movie-name-input:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3);
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(35, 33, 49, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: #e6e6e6;
+            font-size: 1rem;
+            resize: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        .analyze-btn {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+        }
+
+        .clear-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e6e6e6;
+        }
+
+        .clear-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .examples {
+            margin-top: 25px;
+        }
+
+        .examples h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #a78bfa;
+        }
+
+        .example-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .example {
+            padding: 12px 15px;
+            background: rgba(35, 33, 49, 0.6);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .example:hover {
+            background: rgba(167, 139, 250, 0.2);
+            transform: translateX(5px);
+        }
+
+        .example-emoji {
+            font-size: 1.2rem;
+        }
+
+        .output-content {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-box {
+            flex: 1;
+            background: rgba(35, 33, 49, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .emotion-result {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .emotion-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .emotion-tag {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: popIn 0.5s ease-out;
+        }
+
+        .positive {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b185;
+        }
+
+        .negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .neutral {
+            background: rgba(156, 163, 175, 0.2);
+            color: #9ca3af;
+        }
+
+        .mixed {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+        }
+
+        .score-cards {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .score-card {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(35, 33, 49, 0.8);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .score-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .score-positive {
+            color: #10b185;
+        }
+
+        .score-negative {
+            color: #ef4444;
+        }
+
+        .score-mixed {
+            color: #8b5cf6;
+        }
+
+        .analysis-details {
+            margin-top: 25px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loader .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(167, 139, 250, 0.3);
+            border-radius: 50%;
+            border-top-color: #a78bfa;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .review-history {
+            margin-top: 30px;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .history-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+            animation: flipIn 0.8s ease-out;
+        }
+
+        .history-item:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .history-sentiment {
+            font-weight: bold;
+        }
+
+        .history-text {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .individual-results {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .individual-result {
+            background: rgba(35, 33, 49, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .individual-result-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .review-preview {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .overall-conclusion {
+            background: rgba(35, 33, 49, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #a78bfa;
+        }
+
+        .overall-conclusion h3 {
+            color: #a78bfa;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(35, 33, 49, 0.6);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popIn {
+            0% { 
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes flipIn {
+            from {
+                opacity: 0;
+                transform: rotateX(90deg);
+            }
+            to {
+                opacity: 1;
+                transform: rotateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Glassy icons */
+        .glassy-icon {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--glass-shadow);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .score-cards {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tabs-container {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><div class="glassy-icon"><i class="fas fa-robot"></i></div> CinemaSense AI</h1>
+            <p class="tagline">Advanced movie emotion analysis powered by AI</p>
+        </header>
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="single">Single Review</div>
+                <div class="tab" data-tab="multiple">Multiple Reviews</div>
+                <div class="tab" data-tab="history">History</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2><div class="glassy-icon"><i class="fas fa-pencil-alt"></i></div> Enter Movie Review</h2>
+                
+                <input type="text" id="movie-name" class="movie-name-input" placeholder="Enter movie name...">
+                
+                <textarea id="review-input" placeholder="Type or paste a movie review here..."></textarea>
+                
+                <div id="multiple-reviews" style="display: none;">
+                    <h3><div class="glassy-icon"><i class="fas fa-layer-group"></i></div> Additional Reviews</h3>
+                    <textarea class="additional-review" placeholder="Second review..."></textarea>
+                    <textarea class="additional-review" placeholder="Third review..."></textarea>
+                    <button style="margin-top: 10px; margin-bottom: 20px;" id="add-review-btn" class="analyze-btn">
+                        <i class="fas fa-plus"></i> Add Another Review
+                    </button>
+                </div>
+                
+                <div class="button-group">
+                    <button class="analyze-btn pulse" id="analyze-btn">
+                        <div class="glassy-icon"><i class="fas fa-brain"></i></div> Analyze Emotions
+                    </button>
+                    <button class="clear-btn" id="clear-btn">
+                        <div class="glassy-icon"><i class="fas fa-eraser"></i></div> Clear
+                    </button>
+                </div>
+
+                <div class="examples">
+                    <h3><div class="glassy-icon"><i class="fas fa-lightbulb"></i></div> Example Reviews</h3>
+                    <div class="example-list">
+                        <div class="example" data-review="This movie was an absolute masterpiece! The acting was superb, the storyline was engaging from start to finish, and the cinematography was breathtaking. I was on the edge of my seat the entire time.">
+                            <span>Positive Review Example</span>
+                            <span class="example-emoji">😍</span>
+                        </div>
+                        <div class="example" data-review="I found the film to be quite disappointing. The plot was predictable, the characters were one-dimensional, and the pacing was terribly slow. I wouldn't recommend it.">
+                            <span>Negative Review Example</span>
+                            <span class="example-emoji">😞</span>
+                        </div>
+                        <div class="example" data-review="The movie had some interesting moments, but overall it was just okay. Some scenes were well executed while others fell flat. The acting was decent but not remarkable.">
+                            <span>Mixed Review Example</span>
+                            <span class="example-emoji">😐</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h2><div class="glassy-icon"><i class="fas fa-chart-bar"></i></div> Emotion Analysis</h2>
+                
+                <div class="output-content">
+                    <div class="loader" id="loader">
+                        <div class="spinner"></div>
+                        <p>Analyzing emotions with AI... ✨</p>
+                    </div>
+                    
+                    <div class="result-box" id="result-box">
+                        <div class="emotion-result">
+                            <p>Your analysis will appear here. Enter a movie review and click "Analyze Emotions" to get started.</p>
+                        </div>
+                        <div class="emotion-tags" id="emotion-tags">
+                            <!-- Emotion tags will be added here -->
+                        </div>
+                        
+                        <div class="score-cards" id="score-cards">
+                            <!-- Score cards will be added here -->
+                        </div>
+                        
+                        <div class="individual-results" id="individual-results">
+                            <!-- Individual review results will be added here -->
+                        </div>
+                        
+                        <div class="overall-conclusion" id="overall-conclusion" style="display: none;">
+                            <h3><i class="fas fa-star"></i> Overall Conclusion</h3>
+                            <p id="conclusion-text"></p>
+                            <div class="detail-item">
+                                <span><i class="fas fa-chart-line"></i> Average Rating:</span>
+                                <span id="average-rating">--</span>
+                            </div>
+                        </div>
+                        
+                        <div class="analysis-details">
+                            <div class="detail-item">
+                                <span><div class="glassy-icon"><i class="fas fa-smile"></i></div> Overall Sentiment:</span>
+                                <span>--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span><div class="glassy-icon"><i class="fas fa-fire"></i></div> Emotion Intensity:</span>
+                                <span>--</span>
+                            </div>
+                            <div class="detail-item">
+                                <span><div class="glassy-icon"><i class="fas fa-star"></i></div> Rating Score:</span>
+                                <span>--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="review-history" id="history-section" style="display: none;">
+            <div class="history-header">
+                <h2><div class="glassy-icon"><i class="fas fa-history"></i></div> Analysis History</h2>
+                <button class="clear-btn" id="clear-history-btn">
+                    <div class="glassy-icon"><i class="fas fa-trash"></i></div> Clear History
+                </button>
+            </div>
+            <div class="history-list" id="history-list">
+                <!-- History items will be added here -->
+            </div>
+        </div>
+
+        <footer>
+            <p>Powered by ajs proj | CinemaSense AI © 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const movieNameInput = document.getElementById('movie-name');
+            const reviewInput = document.getElementById('review-input');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const loader = document.getElementById('loader');
+            const resultBox = document.getElementById('result-box');
+            const emotionTags = document.getElementById('emotion-tags');
+            const scoreCards = document.getElementById('score-cards');
+            const individualResults = document.getElementById('individual-results');
+            const examples = document.querySelectorAll('.example');
+            const detailItems = document.querySelectorAll('.detail-item');
+            const tabs = document.querySelectorAll('.tab');
+            const multipleReviewsSection = document.getElementById('multiple-reviews');
+            const historySection = document.getElementById('history-section');
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            const addReviewBtn = document.getElementById('add-review-btn');
+            const overallConclusion = document.getElementById('overall-conclusion');
+            const conclusionText = document.getElementById('conclusion-text');
+            const averageRating = document.getElementById('average-rating');
+            
+            let analysisHistory = JSON.parse(localStorage.getItem('movieAnalysisHistory')) || [];
+            let currentTab = 'single';
+            
+            // Initialize the UI
+            updateHistoryUI();
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+            
+            function switchTab(tabName) {
+                currentTab = tabName;
+                
+                // Update tab UI
+                tabs.forEach(tab => {
+                    if (tab.getAttribute('data-tab') === tabName) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                // Show/hide appropriate sections
+                if (tabName === 'multiple') {
+                    multipleReviewsSection.style.display = 'block';
+                    historySection.style.display = 'none';
+                } else if (tabName === 'history') {
+                    multipleReviewsSection.style.display = 'none';
+                    historySection.style.display = 'block';
+                    updateHistoryUI();
+                } else {
+                    multipleReviewsSection.style.display = 'none';
+                    historySection.style.display = 'none';
+                }
+            }
+            
+            // Add another review field
+            addReviewBtn.addEventListener('click', function() {
+                const reviewFields = document.querySelectorAll('.additional-review');
+                if (reviewFields.length < 5) {
+                    const newField = document.createElement('textarea');
+                    newField.classList.add('additional-review');
+                    newField.placeholder = 'Another review...';
+                    addReviewBtn.parentNode.insertBefore(newField, addReviewBtn);
+                    
+                    // Add animation to the new field
+                    newField.style.opacity = '0';
+                    newField.style.transform = 'translateY(10px)';
+                    
+                    setTimeout(() => {
+                        newField.style.transition = 'all 0.3s ease';
+                        newField.style.opacity = '1';
+                        newField.style.transform = 'translateY(0)';
+                    }, 10);
+                } else {
+                    alert('Maximum of 5 reviews allowed at once');
+                }
+            });
+            
+            // Example review click event
+            examples.forEach(example => {
+                example.addEventListener('click', function() {
+                    reviewInput.value = this.getAttribute('data-review');
+                    switchTab('single');
+                    
+                    // Add animation effect
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+            
+            // Clear button event
+            clearBtn.addEventListener('click', function() {
+                movieNameInput.value = '';
+                reviewInput.value = '';
+                document.querySelectorAll('.additional-review').forEach(field => {
+                    field.value = '';
+                });
+                
+                resultBox.querySelector('.emotion-result').innerHTML = 
+                    '<p>Your analysis will appear here. Enter a movie review and click "Analyze Emotions" to get started.</p>';
+                emotionTags.innerHTML = '';
+                scoreCards.innerHTML = '';
+                individualResults.innerHTML = '';
+                overallConclusion.style.display = 'none';
+                
+                detailItems.forEach(item => {
+                    item.querySelector('span:last-child').textContent = '--';
+                });
+                
+                // Animation effect
+                resultBox.style.opacity = '0.5';
+                setTimeout(() => {
+                    resultBox.style.transition = 'opacity 0.5s ease';
+                    resultBox.style.opacity = '1';
+                }, 300);
+            });
+            
+            // Clear history button
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all analysis history?')) {
+                    analysisHistory = [];
+                    localStorage.setItem('movieAnalysisHistory', JSON.stringify(analysisHistory));
+                    
+                    // Animation effect
+                    historyList.style.opacity = '0.5';
+                    setTimeout(() => {
+                        updateHistoryUI();
+                        historyList.style.transition = 'opacity 0.5s ease';
+                        historyList.style.opacity = '1';
+                    }, 300);
+                }
+            });
+            
+            // Analyze button event
+            analyzeBtn.addEventListener('click', function() {
+                const movieName = movieNameInput.value.trim();
+                
+                if (currentTab === 'single') {
+                    const reviewText = reviewInput.value.trim();
+                    
+                    if (!reviewText) {
+                        alert('Please enter a movie review to analyze.');
+                        return;
+                    }
+                    
+                    analyzeReviews([reviewText], movieName);
+                } else if (currentTab === 'multiple') {
+                    const reviews = [reviewInput.value.trim()];
+                    document.querySelectorAll('.additional-review').forEach(field => {
+                        if (field.value.trim()) {
+                            reviews.push(field.value.trim());
+                        }
+                    });
+                    
+                    if (reviews.length === 0 || (reviews.length === 1 && !reviews[0])) {
+                        alert('Please enter at least one movie review to analyze.');
+                        return;
+                    }
+                    
+                    analyzeReviews(reviews, movieName);
+                }
+            });
+            
+            // Function to analyze reviews
+            function analyzeReviews(reviews, movieName) {
+                // Show loader, hide results
+                loader.style.display = 'block';
+                resultBox.style.opacity = '0.3';
+                
+                // Simulate AI processing (in a real app, this would call your backend)
+                setTimeout(() => {
+                    const results = [];
+                    
+                    for (const review of reviews) {
+                        if (review.trim()) {
+                            results.push(analyzeSingleReview(review));
+                        }
+                    }
+                    
+                    displayResults(results, reviews, movieName);
+                    
+                    // Add to history
+                    if (results.length > 0) {
+                        if (results.length === 1) {
+                            analysisHistory.unshift({
+                                movieName: movieName || 'Untitled Movie',
+                                review: reviews[0],
+                                sentiment: results[0].overallSentiment,
+                                emotions: results[0].emotionList,
+                                score: results[0].score,
+                                date: new Date().toISOString()
+                            });
+                        } else {
+                            // For multiple reviews, store a summary
+                            analysisHistory.unshift({
+                                movieName: movieName || 'Multiple Movies',
+                                review: `Analysis of ${results.length} reviews`,
+                                sentiment: calculateAverageSentiment(results),
+                                emotions: getTopEmotions(results),
+                                score: calculateAverageScore(results),
+                                date: new Date().toISOString(),
+                                isMultiple: true,
+                                individualResults: results.map((result, index) => ({
+                                    sentiment: result.overallSentiment,
+                                    score: result.score,
+                                    preview: reviews[index].substring(0, 100) + (reviews[index].length > 100 ? '...' : '')
+                                }))
+                            });
+                        }
+                        
+                        // Keep only the last 10 analyses
+                        if (analysisHistory.length > 10) {
+                            analysisHistory = analysisHistory.slice(0, 10);
+                        }
+                        
+                        // Save to localStorage
+                        localStorage.setItem('movieAnalysisHistory', JSON.stringify(analysisHistory));
+                    }
+                    
+                    // Show results
+                    loader.style.display = 'none';
+                    resultBox.style.opacity = '1';
+                }, 2000);
+            }
+            
+            // Function to analyze a single review
+            function analyzeSingleReview(review) {
+                // Simple sentiment analysis based on keywords
+                const positiveWords = ['excellent', 'amazing', 'great', 'awesome', 'masterpiece', 'superb', 'engaging', 'breathtaking', 'love', 'best', 'brilliant', 'fantastic', 'wonderful', 'perfect', 'outstanding'];
+                const negativeWords = ['disappointing', 'predictable', 'terribly', 'bad', 'worst', 'boring', 'awful', 'terrible', 'waste', 'poor', 'weak', 'fails', 'horrible', 'mess', 'confusing'];
+                
+                let positiveCount = 0;
+                let negativeCount = 0;
+                
+                positiveWords.forEach(word => {
+                    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                    const matches = review.match(regex);
+                    if (matches) positiveCount += matches.length;
+                });
+                
+                negativeWords.forEach(word => {
+                    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                    const matches = review.match(regex);
+                    if (matches) negativeCount += matches.length;
+                });
+                
+                // Calculate score based on word counts
+                const totalWords = positiveCount + negativeCount;
+                let score = 50; // Neutral base score
+                
+                if (totalWords > 0) {
+                    score = 50 + ((positiveCount - negativeCount) / totalWords) * 50;
+                    score = Math.max(0, Math.min(100, Math.round(score))); // Clamp between 0-100
+                }
+                
+                // Determine overall sentiment
+                let overallSentiment, intensity, emotionList;
+                
+                if (positiveCount > negativeCount + 2) {
+                    overallSentiment = 'Positive';
+                    intensity = 'High';
+                    emotionList = ['Joy', 'Excitement', 'Satisfaction', 'Amusement', 'Admiration'];
+                } else if (negativeCount > positiveCount + 2) {
+                    overallSentiment = 'Negative';
+                    intensity = 'High';
+                    emotionList = ['Disappointment', 'Frustration', 'Boredom', 'Anger', 'Confusion'];
+                } else if (positiveCount === 0 && negativeCount === 0) {
+                    overallSentiment = 'Neutral';
+                    intensity = 'Low';
+                    emotionList = ['Neutral', 'Indifference', 'Curiosity'];
+                } else {
+                    overallSentiment = 'Mixed';
+                    intensity = 'Medium';
+                    emotionList = ['Confusion', 'Curiosity', 'Surprise', 'Contemplation'];
+                }
+                
+                // Adjust intensity based on word count
+                if (totalWords < 2) {
+                    intensity = 'Low';
+                } else if (totalWords < 5) {
+                    intensity = 'Medium';
+                } else {
+                    intensity = 'High';
+                }
+                
+                return {
+                    overallSentiment,
+                    intensity,
+                    emotionList,
+                    score,
+                    positiveCount,
+                    negativeCount
+                };
+            }
+            
+            // Function to display results
+            function displayResults(results, reviews, movieName) {
+                // Show overall conclusion for multiple reviews
+                if (results.length > 1) {
+                    overallConclusion.style.display = 'block';
+                    const avgScore = calculateAverageScore(results);
+                    const avgSentiment = calculateAverageSentiment(results);
+                    
+                    // Set conclusion text based on average sentiment and score
+                    if (avgSentiment === 'Positive') {
+                        conclusionText.textContent = `Based on ${results.length} reviews, this movie is generally well-received. Viewers enjoyed the film and would likely recommend it to others.`;
+                    } else if (avgSentiment === 'Negative') {
+                        conclusionText.textContent = `Based on ${results.length} reviews, this movie received mostly negative feedback. Viewers had significant issues with various aspects of the film.`;
+                    } else if (avgSentiment === 'Neutral') {
+                        conclusionText.textContent = `Based on ${results.length} reviews, this movie received mixed to neutral feedback. Viewers had both positive and negative opinions about different aspects.`;
+                    } else {
+                        conclusionText.textContent = `Based on ${results.length} reviews, this movie received mixed feedback. Some viewers enjoyed it while others had significant criticisms.`;
+                    }
+                    
+                    averageRating.textContent = `${Math.round(avgScore)}/100 ${avgScore >= 70 ? '👍' : avgScore >= 50 ? '🤔' : '👎'}`;
+                } else {
+                    overallConclusion.style.display = 'none';
+                }
+                
+                // Update emotion tags
+                emotionTags.innerHTML = '';
+                const allEmotions = [...new Set(results.flatMap(result => result.emotionList))];
+                
+                allEmotions.slice(0, 6).forEach(emotion => {
+                    const tag = document.createElement('div');
+                    tag.classList.add('emotion-tag');
+                    
+                    if (['Joy', 'Excitement', 'Satisfaction', 'Amusement', 'Admiration'].includes(emotion)) {
+                        tag.classList.add('positive');
+                    } else if (['Disappointment', 'Frustration', 'Boredom', 'Anger', 'Confusion'].includes(emotion)) {
+                        tag.classList.add('negative');
+                    } else if (['Neutral', 'Indifference'].includes(emotion)) {
+                        tag.classList.add('neutral');
+                    } else {
+                        tag.classList.add('mixed');
+                    }
+                    
+                    tag.innerHTML = `<i class="fas fa-smile"></i> ${emotion}`;
+                    emotionTags.appendChild(tag);
+                });
+                
+                // Update score cards
+                scoreCards.innerHTML = '';
+                
+                if (results.length === 1) {
+                    const result = results[0];
+                    
+                    const sentimentCard = document.createElement('div');
+                    sentimentCard.classList.add('score-card');
+                    sentimentCard.innerHTML = `
+                        <h3>Sentiment</h3>
+                        <div class="score-value ${result.overallSentiment.toLowerCase()}">${result.overallSentiment}</div>
+                        <p>${result.intensity} Intensity</p>
+                    `;
+                    scoreCards.appendChild(sentimentCard);
+                    
+                    const scoreCard = document.createElement('div');
+                    scoreCard.classList.add('score-card');
+                    scoreCard.innerHTML = `
+                        <h3>Rating Score</h3>
+                        <div class="score-value ${result.score >= 70 ? 'score-positive' : result.score >= 50 ? 'score-mixed' : 'score-negative'}">${result.score}/100</div>
+                        <p>Based on content analysis</p>
+                    `;
+                    scoreCards.appendChild(scoreCard);
+                    
+                    const emotionCard = document.createElement('div');
+                    emotionCard.classList.add('score-card');
+                    emotionCard.innerHTML = `
+                        <h3>Emotions Detected</h3>
+                        <div class="score-value">${result.emotionList.length}</div>
+                        <p>Primary emotions</p>
+                    `;
+                    scoreCards.appendChild(emotionCard);
+                    
+                    // Update detail items
+                    detailItems[0].querySelector('span:last-child').textContent = result.overallSentiment;
+                    detailItems[1].querySelector('span:last-child').textContent = result.intensity;
+                    detailItems[2].querySelector('span:last-child').textContent = `${result.score}/100`;
+                    
+                    // Update emotion result text
+                    const emotionResult = document.querySelector('.emotion-result');
+                    emotionResult.innerHTML = `
+                        <p>The review for <strong>${movieName || 'the movie'}</strong> expresses a <strong>${result.overallSentiment.toLowerCase()}</strong> sentiment with <strong>${result.intensity.toLowerCase()}</strong> intensity.</p>
+                        <p>The primary emotions detected are: <strong>${result.emotionList.join(', ')}</strong>.</p>
+                    `;
+                    
+                    // Clear individual results
+                    individualResults.innerHTML = '';
+                } else {
+                    // For multiple reviews
+                    const avgScore = calculateAverageScore(results);
+                    const avgSentiment = calculateAverageSentiment(results);
+                    
+                    const sentimentCard = document.createElement('div');
+                    sentimentCard.classList.add('score-card');
+                    sentimentCard.innerHTML = `
+                        <h3>Average Sentiment</h3>
+                        <div class="score-value ${avgSentiment.toLowerCase()}">${avgSentiment}</div>
+                        <p>Across ${results.length} reviews</p>
+                    `;
+                    scoreCards.appendChild(sentimentCard);
+                    
+                    const scoreCard = document.createElement('div');
+                    scoreCard.classList.add('score-card');
+                    scoreCard.innerHTML = `
+                        <h3>Average Rating</h3>
+                        <div class="score-value ${avgScore >= 70 ? 'score-positive' : avgScore >= 50 ? 'score-mixed' : 'score-negative'}">${Math.round(avgScore)}/100</div>
+                        <p>Based on content analysis</p>
+                    `;
+                    scoreCards.appendChild(scoreCard);
+                    
+                    const reviewCard = document.createElement('div');
+                    reviewCard.classList.add('score-card');
+                    reviewCard.innerHTML = `
+                        <h3>Reviews Analyzed</h3>
+                        <div class="score-value">${results.length}</div>
+                        <p>Total reviews processed</p>
+                    `;
+                    scoreCards.appendChild(reviewCard);
+                    
+                    // Update detail items
+                    detailItems[0].querySelector('span:last-child').textContent = avgSentiment;
+                    detailItems[1].querySelector('span:last-child').textContent = 'Mixed';
+                    detailItems[2].querySelector('span:last-child').textContent = `${Math.round(avgScore)}/100`;
+                    
+                    // Update emotion result text
+                    const emotionResult = document.querySelector('.emotion-result');
+                    emotionResult.innerHTML = `
+                        <p>Analysis of <strong>${results.length} reviews</strong> for <strong>${movieName || 'the movie'}</strong> shows an overall <strong>${avgSentiment.toLowerCase()}</strong> sentiment.</p>
+                        <p>The average rating score is <strong>${Math.round(avgScore)}/100</strong> based on emotional content analysis.</p>
+                    `;
+                    
+                    // Show individual results
+                    individualResults.innerHTML = '<h3 style="margin-bottom: 15px;"><i class="fas fa-list"></i> Individual Review Analysis</h3>';
+                    
+                    results.forEach((result, index) => {
+                        const individualResult = document.createElement('div');
+                        individualResult.classList.add('individual-result');
+                        
+                        individualResult.innerHTML = `
+                            <div class="individual-result-header">
+                                <span>Review #${index + 1}</span>
+                                <span class="${result.overallSentiment.toLowerCase()}">${result.overallSentiment} (${result.score}/100)</span>
+                            </div>
+                            <div class="review-preview">${reviews[index].substring(0, 120)}${reviews[index].length > 120 ? '...' : ''}</div>
+                            <div class="emotion-tags">
+                                ${result.emotionList.slice(0, 3).map(emotion => {
+                                    let className = 'neutral';
+                                    if (['Joy', 'Excitement', 'Satisfaction', 'Amusement', 'Admiration'].includes(emotion)) {
+                                        className = 'positive';
+                                    } else if (['Disappointment', 'Frustration', 'Boredom', 'Anger', 'Confusion'].includes(emotion)) {
+                                        className = 'negative';
+                                    } else if (['Neutral', 'Indifference'].includes(emotion)) {
+                                        className = 'neutral';
+                                    } else {
+                                        className = 'mixed';
+                                    }
+                                    
+                                    return `<div class="emotion-tag ${className}"><i class="fas fa-smile"></i> ${emotion}</div>`;
+                                }).join('')}
+                            </div>
+                        `;
+                        
+                        individualResults.appendChild(individualResult);
+                    });
+                }
+            }
+            
+            // Helper functions
+            function calculateAverageScore(results) {
+                const total = results.reduce((sum, result) => sum + result.score, 0);
+                return total / results.length;
+            }
+            
+            function calculateAverageSentiment(results) {
+                let positiveCount = 0;
+                let negativeCount = 0;
+                let neutralCount = 0;
+                
+                results.forEach(result => {
+                    if (result.overallSentiment === 'Positive') {
+                        positiveCount++;
+                    } else if (result.overallSentiment === 'Negative') {
+                        negativeCount++;
+                    } else if (result.overallSentiment === 'Neutral') {
+                        neutralCount++;
+                    }
+                });
+                
+                if (positiveCount > negativeCount && positiveCount > neutralCount) {
+                    return 'Positive';
+                } else if (negativeCount > positiveCount && negativeCount > neutralCount) {
+                    return 'Negative';
+                } else if (neutralCount > positiveCount && neutralCount > negativeCount) {
+                    return 'Neutral';
+                } else {
+                    return 'Mixed';
+                }
+            }
+            
+            function getTopEmotions(results) {
+                const emotionCount = {};
+                
+                results.forEach(result => {
+                    result.emotionList.forEach(emotion => {
+                        emotionCount[emotion] = (emotionCount[emotion] || 0) + 1;
+                    });
+                });
+                
+                return Object.entries(emotionCount)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5)
+                    .map(entry => entry[0]);
+            }
+            
+            function updateHistoryUI() {
+                historyList.innerHTML = '';
+                
+                if (analysisHistory.length === 0) {
+                    historyList.innerHTML = '<p style="text-align: center; padding: 20px;">No analysis history yet. Analyze some reviews to see them here.</p>';
+                    return;
+                }
+                
+                analysisHistory.forEach((item, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.classList.add('history-item');
+                    
+                    // Format date
+                    const date = new Date(item.date);
+                    const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                    
+                    historyItem.innerHTML = `
+                        <div class="history-item-header">
+                            <strong>${item.movieName}</strong>
+                            <span class="history-sentiment ${item.sentiment.toLowerCase()}">${item.sentiment}</span>
+                        </div>
+                        <div class="history-text">${item.review}</div>
+                        <div style="margin-top: 10px; display: flex; justify-content: space-between; font-size: 0.9rem;">
+                            <span>${formattedDate}</span>
+                            <span>Score: ${item.score}/100</span>
+                        </div>
+                    `;
+                    
+                    historyList.appendChild(historyItem);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
